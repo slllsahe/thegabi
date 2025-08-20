@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lidl Weekly Offers</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f7f7f7;
+    padding: 20px;
+  }
+  h1 {
+    text-align: center;
+    color: #333;
+  }
+  .product-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+  }
+  .product-card {
+    background: #fff;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .product-card:hover {
+    transform: scale(1.02);
+  }
+  .product-card img {
+    max-width: 120px;
+    height: auto;
+    margin-bottom: 10px;
+    border-radius: 4px;
+  }
+  .product-card h3 {
+    margin: 0 0 8px 0;
+    font-size: 18px;
+    color: #222;
+    text-align: center;
+  }
+  .price {
+    font-size: 16px;
+    color: #e63946;
+    font-weight: bold;
+    text-align: center;
+  }
+  .discount {
+    background: #38b000;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+    font-size: 12px;
+  }
+  .details {
+    font-size: 13px;
+    color: #555;
+    margin: 4px 0;
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+
+<h1>Lidl Weekly Offers</h1>
+<div class="product-container" id="product-container"></div>
+
+<script>
+const sheetURL = "https://docs.google.com/spreadsheets/d/1m6ZZkWtT3G1CAYDgPgUchYnblWXtsPvT2kZc_SvFib0/gviz/tq?tqx=out:json";
+
+// ✅ API Key + CX (Google Custom Search)
+const GOOGLE_API_KEY = "AIzaSyB3m30n5a4CCNNGTRN1S1RgQB6v5MJUiEo";
+const GOOGLE_CX = "b27ede3f7bc204f9d";
+
+async function fetchImage(query) {
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/customsearch/v1?q=${encodeURIComponent(query)}&cx=${GOOGLE_CX}&key=${GOOGLE_API_KEY}&searchType=image&num=1`
+    );
+    const data = await res.json();
+    return data.items && data.items.length > 0 ? data.items[0].link : "";
+  } catch (error) {
+    console.error("Image search error:", error);
+    return "";
+  }
+}
+
+fetch(sheetURL)
+  .then(res => res.text())
+  .then(async (text) => {
+    const json = JSON.parse(text.substr(47).slice(0, -2)); 
+    const rows = json.table.rows;
+
+    const products = [];
+    for (let row of rows) {
+      const name = row.c[0]?.v || "";
+      const price = row.c[1]?.v || "";
+      const discount = row.c[2]?.v || "";
+      const category = row.c[3]?.v || "";
+      const details = row.c[4]?.v || "";
+      const validFrom = row.c[5]?.v || "";
+      const validTo = row.c[6]?.v || "";
+      let imageUrl = row.c[7]?.v || "";
+
+      // 이미지 URL이 없으면 Google 검색
+      if (!imageUrl) {
+        imageUrl = await fetchImage(`${name} Lidl`);
+      }
+
+      products.push({ name, price, discount, category, details, validFrom, validTo, imageUrl });
+    }
+
+    const container = document.getElementById('product-container');
+    products.forEach(p => {
+      container.innerHTML += `
+        <div class="product-card">
+          ${p.imageUrl ? `<img src="${p.imageUrl}" alt="${p.name}">` : ""}
+          <h3>${p.name}</h3>
+          <p class="price">${p.price} € <span class="discount">${p.discount}</span></p>
+          <p class="details">${p.category} • ${p.details}</p>
+          <p class="details">Valid: ${p.validFrom} - ${p.validTo}</p>
+        </div>`;
+    });
+  })
+  .catch(err => console.error("Error fetching sheet data:", err));
+</script>
+
+</body>
+</html>

@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>Cheil Germany • Newbie Guide</title>
+  <meta name="description" content="A quick, searchable onboarding guide for Cheil Germany newbies: office layout, perks, apps, access, contacts and FAQ." />
+  <style>
+    :root {
+      --bg: #0b1020;
+      --panel: #121733;
+      --panel-2: #0f1430;
+      --text: #eef1ff;
+      --muted: #a7b0d4;
+      --accent: #6aa4ff;
+      --accent-2: #8affc1;
+      --ok: #57d49d;
+      --warn: #ffd166;
+      --danger: #ff6b6b;
+      --shadow: 0 8px 30px rgba(0,0,0,.25);
+      --radius: 18px;
+    }
+    [data-theme="light"] {
+      --bg: #f7f8ff;
+      --panel: #ffffff;
+      --panel-2: #f0f3ff;
+      --text: #141a34;
+      --muted: #4d587a;
+      --accent: #2f6bff;
+      --accent-2: #15a979;
+      --ok: #1ca67a;
+      --warn: #b78900;
+      --danger: #c23b3b;
+      --shadow: 0 8px 20px rgba(16,22,61,.1);
+    }
+
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, "Noto Sans", "Apple SD Gothic Neo", Arial, sans-serif;
+      background: radial-gradient(1200px 600px at 10% -10%, rgba(106,164,255,.12), transparent 50%),
+                  radial-gradient(800px 400px at 90% 0%, rgba(138,255,193,.12), transparent 50%), var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      -webkit-text-size-adjust: 100%; /* Prevents font scaling on iOS */
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Layout */
+    header {
+      position: sticky; top: 0; z-index: 50;
+      backdrop-filter: blur(10px);
+      background: color-mix(in oklab, var(--bg) 86%, transparent);
+      border-bottom: 1px solid color-mix(in oklab, var(--panel), #000 30%);
+    }
+    .nav {
+      max-width: 1200px; margin: 0 auto; padding: 14px 18px; display: grid; gap: 10px;
+      grid-template-columns: 1fr auto auto; align-items: center;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 650; letter-spacing: .2px; }
+    .logo { width: 28px; height: 28px; border-radius: 8px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); box-shadow: var(--shadow); }
+
+    .search { display: flex; align-items: center; gap: 8px; }
+    .search input {
+      width: clamp(220px, 32vw, 440px);
+      padding: 10px 12px; border-radius: 12px; border: 1px solid color-mix(in oklab, var(--panel), #000 25%);
+      background: var(--panel); color: var(--text); outline: none; box-shadow: var(--shadow);
+    }
+    .search input::placeholder { color: var(--muted); }
+
+    .top-actions { display: flex; gap: 8px; }
+    .btn { 
+      border: 1px solid color-mix(in oklab, var(--panel), #000 25%); 
+      background: var(--panel); 
+      color: var(--text); 
+      padding: 10px 12px; 
+      border-radius: 10px; 
+      cursor: pointer; 
+      box-shadow: var(--shadow);
+      transition: all 0.2s ease;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .btn:hover { 
+      background: color-mix(in oklab, var(--panel), #fff 5%);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.3);
+    }
+    .btn:active { 
+      transform: translateY(0);
+      box-shadow: var(--shadow);
+    }
+    .btn[aria-pressed="true"]{ 
+      outline: 2px solid var(--accent); 
+    }
+
+    main { max-width: 1200px; margin: 22px auto 80px; padding: 0 18px; display: grid; gap: 22px; }
+
+    /* Hero quick links */
+    .quick {
+      display: grid; gap: 14px; grid-template-columns: repeat(3, 1fr);
+    }
+    .card {
+      background: linear-gradient(180deg, color-mix(in oklab, var(--panel), #000 0%), var(--panel-2));
+      border: 1px solid color-mix(in oklab, var(--panel), #000 25%);
+      padding: 16px; border-radius: var(--radius); box-shadow: var(--shadow);
+      display: grid; gap: 10px; position: relative; isolation: isolate;
+      transition: all 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.3);
+      border-color: color-mix(in oklab, var(--accent) 30%, transparent);
+    }
+    .card .title { font-weight: 640; }
+    .card .meta { color: var(--muted); font-size: .9rem; }
+    .chip { display:inline-flex; align-items:center; gap:6px; padding:6px 10px; border-radius:999px; background: color-mix(in oklab, var(--accent) 15%, transparent); color: var(--text); font-size:.85rem; }
+
+    .grid-2 { display: grid; gap: 18px; grid-template-columns: 1.2fr .8fr; }
+    .grid-3 { display: grid; gap: 18px; grid-template-columns: repeat(3, 1fr); }
+
+    /* Mobile responsiveness */
+    @media (max-width: 980px) {
+      .quick { grid-template-columns: repeat(2, 1fr); }
+      .grid-2 { grid-template-columns: 1fr; }
+      .grid-3 { grid-template-columns: 1fr; }
+      .nav { grid-template-columns: 1fr; }
+      .search input { width: 100%; }
+    }
+
+    @media (max-width: 768px) {
+      .nav { 
+        grid-template-columns: 1fr; 
+        gap: 12px; 
+        padding: 12px 16px; 
+      }
+      .brand { 
+        justify-content: center; 
+        font-size: 0.95rem; 
+      }
+      .search input { 
+        width: 100%; 
+        padding: 12px 16px; 
+        font-size: 16px; /* Prevents zoom on iOS */
+      }
+      .top-actions { 
+        justify-content: center; 
+      }
+      .btn { 
+        padding: 12px 16px; 
+        min-height: 44px; /* Better touch target */
+        font-size: 16px;
+      }
+      main { 
+        padding: 0 16px; 
+        gap: 16px; 
+        margin: 16px auto 60px; 
+      }
+      .quick { 
+        grid-template-columns: 1fr; 
+        gap: 12px; 
+      }
+      .card { 
+        padding: 20px; 
+        gap: 12px; 
+      }
+      .copybox { 
+        flex-direction: column; 
+        align-items: stretch; 
+        gap: 8px; 
+        padding: 12px 16px; 
+      }
+      .copybox .btn { 
+        align-self: flex-start; 
+        padding: 10px 14px; 
+        min-height: 44px;
+      }
+      .floor { 
+        grid-template-columns: 1fr; 
+        gap: 8px; 
+        padding: 16px; 
+      }
+      .floor button { 
+        justify-self: stretch; 
+        min-height: 44px;
+      }
+      .section-title { 
+        font-size: 1.1rem; 
+      }
+      .checklist li { 
+        padding: 12px 0; 
+        gap: 12px; 
+      }
+      .checklist input { 
+        width: 20px; 
+        height: 20px; 
+        flex-shrink: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav { 
+        padding: 10px 12px; 
+      }
+      .brand { 
+        font-size: 0.9rem; 
+        gap: 8px; 
+      }
+      .logo { 
+        width: 24px; 
+        height: 24px; 
+      }
+      main { 
+        padding: 0 12px; 
+        gap: 12px; 
+      }
+      .card { 
+        padding: 16px; 
+        border-radius: 14px; 
+      }
+      .copybox { 
+        padding: 10px 12px; 
+      }
+      .btn { 
+        padding: 10px 14px; 
+        font-size: 14px; 
+      }
+      .chip { 
+        padding: 4px 8px; 
+        font-size: 0.8rem; 
+      }
+      .section-title { 
+        font-size: 1rem; 
+        gap: 8px; 
+      }
+      .section-title svg { 
+        width: 18px; 
+        height: 18px; 
+      }
+      .floor { 
+        padding: 12px; 
+      }
+      .floor strong { 
+        font-size: 1rem; 
+      }
+      .pill { 
+        padding: 4px 8px; 
+        font-size: 0.85rem; 
+      }
+      details.acc { 
+        padding: 10px 12px; 
+        border-radius: 12px; 
+      }
+      .faq li { 
+        margin: 10px 0; 
+      }
+      footer { 
+        font-size: 0.85rem; 
+        margin: 12px 0 40px; 
+      }
+    }
+
+    /* Touch-friendly improvements */
+    @media (hover: none) and (pointer: coarse) {
+      .btn:hover { 
+        transform: none; 
+      }
+      .card:hover { 
+        transform: none; 
+      }
+      /* Increase touch targets */
+      .btn { 
+        min-height: 44px; 
+        min-width: 44px; 
+      }
+      .search input { 
+        min-height: 44px; 
+      }
+      /* Better spacing for touch */
+      .card { 
+        margin-bottom: 4px; 
+      }
+      .floor { 
+        margin-bottom: 4px; 
+      }
+    }
+
+    /* Floor map */
+    .floors { display: grid; gap: 12px; }
+    .floor {
+      display: grid; grid-template-columns: 90px 1fr auto; align-items: center; gap: 14px; padding: 12px; border-radius: 14px;
+      border: 1px dashed color-mix(in oklab, var(--panel), #000 30%);
+      background: color-mix(in oklab, var(--panel), transparent 10%);
+    }
+    .floor strong { font-size: 1.05rem; }
+    .pill { padding: 6px 10px; border-radius: 999px; background: color-mix(in oklab, var(--accent) 14%, transparent); }
+    .floor button { justify-self: end; }
+
+    details.acc summary { cursor: pointer; list-style: none; }
+    details.acc summary::-webkit-details-marker { display:none; }
+    details.acc { border: 1px solid color-mix(in oklab, var(--panel), #000 25%); border-radius: 14px; background: var(--panel); padding: 12px 14px; }
+    details.acc[open] { outline: 2px solid color-mix(in oklab, var(--accent) 35%, transparent); }
+
+    /* Copyable blocks */
+    .copybox { display:flex; align-items:center; gap:10px; background: var(--panel-2); border:1px solid color-mix(in oklab, var(--panel), #000 25%); padding:10px 12px; border-radius:10px; }
+    .copybox code { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .95rem; }
+    .copybox .btn { padding: 8px 10px; }
+
+    .faq li { margin: 8px 0; }
+    .muted { color: var(--muted); }
+    .section-title { display:flex; align-items:center; gap: 10px; font-size: 1.15rem; letter-spacing:.2px; }
+    .section-title svg { opacity:.9 }
+    .divider { height:1px; background: color-mix(in oklab, var(--panel), #000 25%); margin: 10px 0 4px; }
+
+    .checklist li { display:flex; align-items:center; gap:10px; padding: 8px 0; }
+    .checklist input { width: 18px; height: 18px; }
+
+    footer { opacity:.8; font-size:.9rem; margin: 18px 0 50px; }
+
+    /* Search highlighting */
+    .hide { display: none !important; }
+    mark { background: color-mix(in oklab, var(--accent-2) 30%, transparent); padding: 0 3px; border-radius: 4px; }
+    
+    /* Search improvements */
+    .search input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px color-mix(in oklab, var(--accent) 20%, transparent);
+    }
+    
+    #searchResults {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-top: 4px;
+      display: none;
+      text-align: center;
+    }
+    
+    /* Ensure search works on mobile */
+    @media (max-width: 768px) {
+      #searchResults {
+        font-size: 0.8rem;
+        margin-top: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="nav" role="navigation" aria-label="Top">
+      <div class="brand" aria-label="Cheil Germany">
+        <div class="logo" aria-hidden="true"></div>
+        <div>Cheil Germany • Newbie Guide</div>
+      </div>
+      <div class="search" role="search">
+        <input id="search" type="search" placeholder="Search: wifi, gym, printer, water, Jira…" aria-label="Search" />
+        <button id="clearSearch" class="btn" style="display: none; padding: 8px 12px; font-size: 14px;" aria-label="Clear search">✕</button>
+      </div>
+      <div class="top-actions">
+        <button id="themeToggle" class="btn" aria-pressed="false" aria-label="Toggle light/dark">🌗 Theme</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- General Information -->
+    <section aria-label="General Information">
+      <div class="section-title">
+        <span>General Information</span>
+      </div>
+      <div class="divider"></div>
+      <div class="grid-3">
+        <article class="card" data-keywords="wifi internet network chctemp1 password guest">
+          <div class="title">Wi‑Fi Access</div>
+          <div class="meta">Connect in seconds</div>
+          <div class="copybox">
+            <span>ID:</span>
+            <code id="wifiId">chctemp1</code>
+            <button class="btn" data-copy="#wifiId">Copy</button>
+          </div>
+          <div class="copybox">
+            <span>PW:</span>
+            <code id="wifiPw">Ch31!Germany</code>
+            <button class="btn" data-copy="#wifiPw">Copy</button>
+          </div>
+          <span class="chip" title="Temporary network">Temp guest</span>
+        </article>
+        <article class="card" data-keywords="hr support contact email">
+          <div class="title">HR Support</div>
+          <div class="meta">We’ll get you set up</div>
+          <div class="copybox">
+            <span>Contact:</span>
+            <code id="hrMail">hr.de@cheil.com</code>
+            <button class="btn" data-copy="#hrMail">Copy</button>
+          </div>
+        </article>
+        <article class="card" data-keywords="it support helpdesk contact saber ahmed email">
+          <div class="title">IT Support</div>
+          <div class="meta">We’ll get you set up</div>
+          <div class="copybox">
+            <span>Contact:</span>
+            <code id="itMail">saberahmed@cheil.com</code>
+            <button class="btn" data-copy="#itMail">Copy</button>
+          </div>
+          <span class="chip">Saber Ahmed</span>
+        </article>
+        <article class="card" data-keywords="printer print how to drivers badge card follow me">
+          <div class="title">Printer</div>
+          <div class="meta">How it works</div>
+          <details class="acc">
+            <summary>Show steps</summary>
+            <ol>
+              <li>Connect to Wi‑Fi.</li>
+              <li>Install network printer (follow‑me queue) — see Tools & Access → Printer.</li>
+              <li>Swipe your badge at the device to release jobs.</li>
+            </ol>
+          </details>
+        </article>
+      </div>
+    </section>
+
+    <!-- Benefit -->
+    <section aria-label="Benefit">
+      <div class="section-title">
+        <span>Benefit</span>
+      </div>
+      <div class="divider"></div>
+      <div class="grid-3">
+        <article class="card" data-keywords="canteen food lunch cafeteria samsung time2eat app code">
+          <div class="title">Samsung Canteen App</div>
+          <div class="meta">Order & see menu</div>
+          <div>Download <strong>time2eat</strong>. Company access code: <code id="canteenCode">Samsung</code></div>
+          <button class="btn" data-copy="#canteenCode">Copy code</button>
+          <div><strong>Canteen opening time</strong>: 12:00 - 1:30pm</div>
+        </article>
+        <article class="card" data-keywords="food vending machine snack app purchase">
+          <div class="title">Food vending machine</div>
+          <div class="meta">Grab a snack</div>
+          <p>Use the vending machine app to purchase items.</p>
+        </article>
+        <article class="card" data-keywords="drinks water filter soft drinks kitchen vending 7.11 b2b price">
+          <div class="title">Drinks</div>
+          <div class="meta">Stay Cool</div>
+          <p>Soft drinks, juice and beers available — feel free to grab me.</p>
+        </article>
+        <article class="card" data-keywords="gym fitness membership downstairs 7.11">
+          <div class="title">Gym</div>
+          <div class="meta">Membership info</div>
+          <p>Please note: Gym <strong>downstairs (7.11)</strong> is currently <strong>not accessible</strong> for Cheil employees.</p>
+          <span class="chip" style="background: color-mix(in oklab, var(--danger) 20%, transparent)">Access closed</span>
+        </article>
+      </div>
+    </section>
+    <!-- Quick access cards removed; content moved to sections above -->
+
+    <!-- Office Layout & Floor Map -->
+    <section class="grid-2" aria-label="Office layout and checklist">
+      <article class="card" id="office" data-keywords="layout floor map hr it soft drinks water kitchen meeting rooms">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 20h16M4 10l8-6 8 6v10H4V10z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span>Office Layout</span>
+        </div>
+        <div class="divider"></div>
+        <div class="floors" id="floors">
+          <div class="floor">
+            <strong>Floor 5</strong>
+            <span class="pill muted">(departments TBD)</span>
+            <button class="btn" data-floor="5">View</button>
+          </div>
+          <div class="floor">
+            <strong>Floor 4</strong>
+            <span class="pill muted">(departments TBD)</span>
+            <button class="btn" data-floor="4">View</button>
+          </div>
+          <div class="floor">
+            <strong>Floor 3</strong>
+            <span class="pill">HR / IT</span>
+            <button class="btn" data-floor="3">View</button>
+          </div>
+          <div class="floor">
+            <strong>Floor 2</strong>
+            <span class="pill muted">(departments TBD)</span>
+            <button class="btn" data-floor="2">View</button>
+          </div>
+          <div class="floor">
+            <strong>Floor 1</strong>
+            <span class="pill muted">(departments TBD)</span>
+            <button class="btn" data-floor="1">View</button>
+          </div>
+        </div>
+        <details id="floorDetails" class="acc" style="margin-top:12px">
+          <summary><strong>Floor details</strong></summary>
+          <div id="floorContent" class="muted">Select a floor to see kitchens, soft drinks and contact points.</div>
+        </details>
+      </article>
+
+      <!-- Checklist -->
+      <article class="card" id="checklist" data-keywords="onboarding checklist tasks first week">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="1.5"/><rect x="2" y="4" width="16" height="16" rx="3" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span>Onboarding Checklist</span>
+        </div>
+        <div class="divider"></div>
+        <ul class="checklist" id="todo">
+          <li><input type="checkbox" data-key="laptop"> <span>Pick up laptop & badge</span></li>
+          <li><input type="checkbox" data-key="wifi"> <span>Connect to Wi‑Fi</span></li>
+          <li><input type="checkbox" data-key="apps"> <span>Install apps (time2eat, JIRA if needed)</span></li>
+          <li><input type="checkbox" data-key="email"> <span>Sign in to email</span></li>
+          <li><input type="checkbox" data-key="printer"> <span>Test printer</span></li>
+          <li><input type="checkbox" data-key="tour"> <span>Explore floors (find water & soft drinks)</span></li>
+          <li><input type="checkbox" data-key="greet"> <span>Send greeting email</span></li>
+        </ul>
+        <div style="display:flex; gap:8px; margin-top:8px">
+          <button class="btn" id="resetChecklist">Reset</button>
+          <span class="muted" id="progressLabel">0/7 done</span>
+        </div>
+      </article>
+    </section>
+
+    <!-- Tools & Access -->
+    <section class="grid-2" aria-label="Tools & Access">
+      <article class="card" data-keywords="credentials laptop mobile email jira knox printer wifi account id password access">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18M3 12h18M3 17h18" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span>Tools & Access</span>
+        </div>
+        <div class="divider"></div>
+        <details class="acc" open>
+          <summary><strong>Network & Accounts</strong></summary>
+          <div class="copybox"><span>Wi‑Fi ID</span> <code id="wifiId2">chctemp1</code> <button class="btn" data-copy="#wifiId2">Copy</button></div>
+          <div class="copybox"><span>Wi‑Fi PW</span> <code id="wifiPw2">Ch31!Germany</code> <button class="btn" data-copy="#wifiPw2">Copy</button></div>
+          <div class="copybox"><span>Company ID</span> <code id="companyId">chc</code> <button class="btn" data-copy="#companyId">Copy</button></div>
+          <p class="muted">Laptop / Email / Knox / JIRA credentials will be provided by IT at first login. (Placeholders here if needed.)</p>
+        </details>
+        <details class="acc">
+          <summary><strong>Printer</strong></summary>
+          <ul>
+            <li>Install the company print queue (ask IT if unsure).</li>
+            <li>Authenticate at the device with your badge to release jobs.</li>
+            <li>For help, contact <code>saberahmed@cheil.com</code>.</li>
+          </ul>
+        </details>
+        <details class="acc">
+          <summary><strong>Mobile & Laptop</strong></summary>
+          <ul>
+            <li>Company mobile & laptop issued on Day 1.</li>
+            <li>Knox ID provided if applicable.</li>
+          </ul>
+        </details>
+      </article>
+
+      <!-- Apps & Links -->
+      <article class="card" data-keywords="apps links canteen time2eat sitting plan vending 7.11 b2b price">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="1.5"/><path d="M4 4h10v10H4z" stroke="currentColor" stroke-width="1.5" opacity=".5"/></svg>
+          <span>Apps & Links</span>
+        </div>
+        <div class="divider"></div>
+        <ul>
+          <li><strong>Samsung Canteen App</strong>: Download <em>time2eat</em>, company code <code>Samsung</code>.</li>
+          <li><strong>Sitting plan app</strong>: <a href="#" aria-label="Sitting plan link 1">link</a> · <a href="#" aria-label="Sitting plan link 2">link2</a></li>
+          <li><strong>Foodie vending machine app</strong>: (add store link)</li>
+          <li><strong>B2B pricing @ 7.11</strong>: Check B2C price first for best deal, then inquire at <em>7.11</em> directly.</li>
+        </ul>
+      </article>
+    </section>
+
+    <!-- FAQ & Drinks/Water -->
+    <section class="grid-2" aria-label="FAQ and Contacts">
+      <article class="card" data-keywords="faq questions water filter soft drinks kitchen how to guide newbie">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 18h.01M8 10a4 4 0 118 0c0 2-4 2-4 5" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span>FAQ</span>
+        </div>
+        <div class="divider"></div>
+        <details class="acc">
+          <summary><strong>How to use filter water?</strong></summary>
+          <ol>
+            <li>Find the water filter station (kitchen icon on each floor).</li>
+            <li>Place your bottle under the spout and press the chilled or ambient button.</li>
+            <li>Please keep the area tidy for the next person.</li>
+          </ol>
+        </details>
+        
+        <details class="acc">
+          <summary><strong>How do I get meeting room?</strong></summary>
+          <p>Please book via your team’s process or ask HR for guidance.</p>
+        </details>
+      </article>
+
+      <!-- Contacts -->
+      <article class="card" data-keywords="contacts hr it facilities emergency email phone saber ahmed">
+        <div class="section-title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="7" r="3" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span>Contacts</span>
+        </div>
+        <div class="divider"></div>
+        <ul>
+          <li><strong>Facilities</strong>: (add contact)</li>
+          <li><strong>HR</strong>: <a href="mailto:hr.de@cheil.com">hr.de@cheil.com</a></li>
+          <li><strong>IT</strong>: Saber Ahmed — <a href="mailto:saberahmed@cheil.com">saberahmed@cheil.com</a></li>
+        </ul>
+      </article>
+    </section>
+
+
+    <footer class="muted">Last updated: <span id="updated"></span></footer>
+  </main>
+
+  <script>
+    // --- Theme toggle (persist to localStorage)
+    const themeToggle = document.getElementById('themeToggle');
+    const root = document.documentElement;
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) root.setAttribute('data-theme', savedTheme);
+    themeToggle.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.setAttribute('aria-pressed', next === 'light');
+    });
+
+    // --- Updated timestamp
+    document.getElementById('updated').textContent = new Date().toLocaleString();
+
+    // --- Copy buttons
+    document.querySelectorAll('[data-copy]').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        const sel = btn.getAttribute('data-copy');
+        const el = document.querySelector(sel);
+        const text = el?.textContent?.trim() || '';
+        try { await navigator.clipboard.writeText(text); btn.textContent = 'Copied!'; setTimeout(()=>btn.textContent='Copy', 1200); }
+        catch { btn.textContent = 'Copy failed'; setTimeout(()=>btn.textContent='Copy', 1200); }
+      });
+    });
+
+    // --- Search filter (cards + sections)
+    const search = document.getElementById('search');
+    const filterables = Array.from(document.querySelectorAll('[data-keywords]'));
+    
+    // Debug: Log search elements
+    console.log('Search elements found:', filterables.length);
+    
+    function normalize(s){ return s.toLowerCase().trim(); }
+    
+    function highlight(el, term){
+      // naive highlight within text nodes
+      const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null);
+      const nodes = [];
+      while (walker.nextNode()) nodes.push(walker.currentNode);
+      nodes.forEach(n => {
+        const t = n.nodeValue; if (!t) return;
+        const parent = n.parentNode; if (!parent) return;
+        parent.replaceChildren();
+        if (!term) { parent.textContent = t; return; }
+        const parts = t.split(new RegExp(`(${term})`, 'ig'));
+        parts.forEach(p => {
+          if (!p) return;
+          if (p.toLowerCase() === term.toLowerCase()) { const m = document.createElement('mark'); m.textContent = p; parent.appendChild(m); }
+          else { parent.appendChild(document.createTextNode(p)); }
+        });
+      });
+    }
+    
+    let lastTerm = '';
+    let searchTimeout;
+    
+    search.addEventListener('input', (e) => {
+      // Clear previous timeout
+      clearTimeout(searchTimeout);
+      
+      // Add visual feedback
+      search.style.borderColor = search.value.trim() ? 'var(--accent)' : '';
+      
+      // Debounce search for better performance
+      searchTimeout = setTimeout(() => {
+        const term = normalize(search.value);
+        console.log('Searching for:', term);
+        
+        let visibleCount = 0;
+        filterables.forEach(el => {
+          const keys = (el.getAttribute('data-keywords')||'') + ' ' + el.textContent;
+          const hit = normalize(keys).includes(term);
+          el.classList.toggle('hide', !!term && !hit);
+          if (!el.classList.contains('hide')) visibleCount++;
+        });
+        
+        console.log('Visible elements:', visibleCount);
+        
+        // Clean previous highlights if query shrinks to empty
+        if (lastTerm && !term) {
+          document.querySelectorAll('mark').forEach(m => { 
+            const t = document.createTextNode(m.textContent); 
+            m.replaceWith(t); 
+          });
+        }
+        
+        // Highlight matches in visible cards
+        if (term) {
+          document.querySelectorAll('.card:not(.hide)').forEach(card => highlight(card, term));
+        }
+        
+        lastTerm = term;
+        
+        // Show search results count
+        const resultsInfo = document.getElementById('searchResults');
+        if (resultsInfo) {
+          if (term) {
+            resultsInfo.textContent = `${visibleCount} results found`;
+            resultsInfo.style.display = 'block';
+          } else {
+            resultsInfo.style.display = 'none';
+          }
+        }
+      }, 150); // 150ms debounce
+    });
+    
+    // Add search results counter
+    const searchContainer = search.parentElement;
+    const resultsInfo = document.createElement('div');
+    resultsInfo.id = 'searchResults';
+    resultsInfo.style.cssText = 'font-size: 0.85rem; color: var(--muted); margin-top: 4px; display: none;';
+    searchContainer.appendChild(resultsInfo);
+    
+    // Clear search button functionality
+    const clearSearchBtn = document.getElementById('clearSearch');
+    clearSearchBtn.addEventListener('click', () => {
+      search.value = '';
+      search.focus();
+      // Trigger search event to clear results
+      search.dispatchEvent(new Event('input'));
+    });
+    
+    // Show/hide clear button based on search input
+    search.addEventListener('input', () => {
+      clearSearchBtn.style.display = search.value.trim() ? 'block' : 'none';
+    });
+
+    // --- Floor details (demo content)
+    const floorMeta = {
+      5: {
+        desc: 'Meeting rooms cluster · Terrace access · Vending',
+        icons: ['🧊 Soft drinks (fridge)', '🖨️ Printer', '🧼 Kitchen']
+      },
+      4: {
+        desc: 'Open collaboration area · Studios',
+        icons: ['🧊 Soft drinks', '☕ Coffee', '🧼 Kitchen']
+      },
+      3: {
+        desc: 'HR · IT Helpdesk · Onboarding point',
+        icons: ['🧊 Soft drinks near HR', '💧 Water filter by IT', '🖨️ Printer']
+      },
+      2: {
+        desc: 'Project rooms · Quiet pods',
+        icons: ['💧 Water filter', '☕ Coffee']
+      },
+      1: {
+        desc: 'Reception · Visitor lounge',
+        icons: ['💧 Water filter', '🧊 Soft drinks']
+      }
+    };
+    document.querySelectorAll('[data-floor]').forEach(b => {
+      b.addEventListener('click', () => {
+        const f = b.getAttribute('data-floor');
+        const data = floorMeta[f];
+        const box = document.getElementById('floorContent');
+        const wrap = document.getElementById('floorDetails');
+        if (!data) { box.textContent = 'Details coming soon.'; wrap.open = true; return; }
+        box.innerHTML = `<p><strong>Floor ${f}</strong>: ${data.desc}</p><ul>${data.icons.map(i=>`<li>${i}</li>`).join('')}</ul>`;
+        wrap.open = true;
+      });
+    });
+
+    // --- Checklist persistence
+    const storageKey = 'cheil-onboarding-checklist-v1';
+    const state = JSON.parse(localStorage.getItem(storageKey) || '{}');
+    const boxes = document.querySelectorAll('#todo input[type="checkbox"]');
+    const label = document.getElementById('progressLabel');
+    function refreshProgress(){
+      const total = boxes.length; const done = Array.from(boxes).filter(b=>b.checked).length; label.textContent = `${done}/${total} done`;
+    }
+    boxes.forEach(b => {
+      const key = b.getAttribute('data-key');
+      b.checked = !!state[key];
+      b.addEventListener('change', () => {
+        state[key] = b.checked; localStorage.setItem(storageKey, JSON.stringify(state)); refreshProgress();
+      });
+    });
+    refreshProgress();
+    document.getElementById('resetChecklist').addEventListener('click', () => {
+      boxes.forEach(b=>b.checked=false); localStorage.removeItem(storageKey); refreshProgress();
+    });
+  </script>
+</body>
+</html>

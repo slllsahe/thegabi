@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Gabi Menu</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", sans-serif;
+      background: #fff;
+      color: #333;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    header {
+      width: 100%;
+      text-align: center;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 10px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    header h1 {
+      margin: 5px 0;
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    header p {
+      margin: 0;
+      font-size: 1rem;
+      color: #777;
+    }
+
+    .menu-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      padding: 20px;
+      max-width: 600px;
+      width: 100%;
+    }
+
+    .menu-list img {
+      width: 100%;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .menu-list img:hover {
+      transform: scale(1.02);
+    }
+
+    .fullscreen-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      touch-action: none;
+    }
+
+    .fullscreen-overlay img {
+      max-width: 100%;
+      max-height: 80%;
+      object-fit: contain;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+    }
+
+    .fullscreen-overlay.landscape img {
+      max-width: 90%;
+      max-height: 95%; /* 가로 모드에서 더 크게 */
+    }
+
+    .nav-buttons {
+      margin-top: 15px;
+      display: flex;
+      gap: 20px;
+    }
+
+    .nav-buttons button {
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      padding: 10px 20px;
+      border-radius: 25px;
+      color: #fff;
+      font-size: 1rem;
+      cursor: pointer;
+      backdrop-filter: blur(4px);
+    }
+
+    .nav-buttons button:hover {
+      background: rgba(255, 255, 255, 0.4);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.3);
+      color: #fff;
+      border: none;
+      font-size: 1.2rem;
+      padding: 5px 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .indicator {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px 10px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Drink & Yogurt Menu</h1>
+    <p>Wifi PW: cafethegabi</p>
+  </header>
+
+  <div class="menu-list">
+    <img src="https://i.postimg.cc/MTmR2nz8/drink-menu.jpg" alt="Drink Menu" onclick="openFullscreen(0)" />
+    <img src="https://i.postimg.cc/mDsM5Yfw/yogurt-menu.jpg" alt="Yogurt Menu" onclick="openFullscreen(1)" />
+  </div>
+
+  <div class="fullscreen-overlay" id="fullscreen">
+    <div class="indicator" id="indicator">1 / 2</div>
+    <button class="close-btn" onclick="closeFullscreen()">✕</button>
+    <img id="fullscreenImg" src="" alt="Menu" />
+    <div class="nav-buttons">
+      <button onclick="prevImage()">Previous</button>
+      <button onclick="nextImage()">Next</button>
+    </div>
+  </div>
+
+  <script>
+    const images = [
+      "https://i.postimg.cc/MTmR2nz8/drink-menu.jpg",
+      "https://i.postimg.cc/mDsM5Yfw/yogurt-menu.jpg"
+    ];
+    let currentIndex = 0;
+
+    const fullscreen = document.getElementById("fullscreen");
+    const fullscreenImg = document.getElementById("fullscreenImg");
+    const indicator = document.getElementById("indicator");
+
+    function openFullscreen(index) {
+      currentIndex = index;
+      fullscreen.style.display = "flex";
+      updateImage();
+      checkOrientation();
+    }
+
+    function closeFullscreen() {
+      fullscreen.style.display = "none";
+    }
+
+    function updateImage() {
+      fullscreenImg.src = images[currentIndex];
+      indicator.textContent = `${currentIndex + 1} / ${images.length}`;
+    }
+
+    function prevImage() {
+      currentIndex = (currentIndex - 1 + images.length) % images.length;
+      updateImage();
+    }
+
+    function nextImage() {
+      currentIndex = (currentIndex + 1) % images.length;
+      updateImage();
+    }
+
+    // ✅ Swipe 기능 추가
+    let startX = 0;
+    let endX = 0;
+
+    fullscreen.addEventListener("touchstart", (e) => {
+      startX = e.touches[0].clientX;
+    });
+
+    fullscreen.addEventListener("touchend", (e) => {
+      endX = e.changedTouches[0].clientX;
+      handleSwipe();
+    });
+
+    function handleSwipe() {
+      const diff = startX - endX;
+      if (Math.abs(diff) > 50) {
+        if (diff > 0) {
+          nextImage();
+        } else {
+          prevImage();
+        }
+      }
+    }
+
+    // ✅ 화면 회전 시 이미지 크기 자동 조정
+    window.addEventListener("orientationchange", checkOrientation);
+
+    function checkOrientation() {
+      if (window.matchMedia("(orientation: landscape)").matches) {
+        fullscreen.classList.add("landscape");
+      } else {
+        fullscreen.classList.remove("landscape");
+      }
+    }
+  </script>
+</body>
+</html>

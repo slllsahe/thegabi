@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dashboard Ticker</title>
+<style>
+  :root{ --bg:#0b0f14; --fg:#e6eef7; --muted:#9fb0c0; --chip:#141c24; --accent:#4cc9f0; --good:#22c55e; --warn:#f59e0b; }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f7fafc; --fg:#0b1220; --muted:#5a6b7b; --chip:#ffffff; --accent:#2563eb; }
+  }
+  *{box-sizing:border-box}
+  body{ margin:0; padding:32px; background:radial-gradient(1200px 600px at 10% -10%, rgba(76,201,240,.12), transparent 50%), var(--bg);
+        color:var(--fg); font:14px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial; }
+  .card{ max-width:880px; margin:0 auto; padding:16px 18px; border-radius:16px; background:rgba(255,255,255,.04);
+         box-shadow:0 6px 28px rgba(0,0,0,.25), inset 0 1px 0 rgba(255,255,255,.06); backdrop-filter:blur(8px);
+         border:1px solid rgba(255,255,255,.08); }
+  .row{ display:flex; gap:10px; align-items:center; flex-wrap:wrap }
+  .title{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
+  .title h2{ margin:0; font-size:16px; color:var(--muted); letter-spacing:.2px }
+  .chip{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:var(--chip);
+         border:1px solid rgba(255,255,255,.08); white-space:nowrap; }
+  .chip .v{ font-weight:700 }
+  .meta{ margin-top:10px; color:var(--muted); display:flex; gap:12px; align-items:center; flex-wrap:wrap }
+  .dot{ width:6px; height:6px; border-radius:50%; background:var(--good); display:inline-block }
+  .link{ color:var(--accent); text-decoration:none } .link:hover{text-decoration:underline}
+  .btn{ display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:10px; border:1px solid rgba(255,255,255,.14);
+        background:transparent; color:var(--fg); cursor:pointer; font-weight:600 }
+  .btn[disabled]{ opacity:.6; cursor:default }
+  .spin{ width:14px; height:14px; border:2px solid rgba(255,255,255,.3); border-top-color:var(--accent);
+         border-radius:50%; animation:sp 1s linear infinite }
+  @keyframes sp{to{transform:rotate(360deg)}}
+  /* skeleton */
+  .sk{ position:relative; overflow:hidden } .sk::after{ content:""; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+       animation:shim 1.2s linear infinite } @keyframes shim{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+  .hide{display:none} .err{ color:#ef4444; font-weight:600 }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="title">
+    <h2>Live Ticker</h2>
+    <div class="row" style="gap:8px">
+      <span id="next" class="meta" style="margin:0"></span>
+      <button id="btn" class="btn" type="button" title="Refresh now">↻ Refresh</button>
+    </div>
+  </div>
+
+  <!-- 로딩 스켈레톤 -->
+  <div id="skeleton" class="row">
+    <div class="chip sk" style="width:160px;height:34px"></div>
+    <div class="chip sk" style="width:170px;height:34px"></div>
+    <div class="chip sk" style="width:150px;height:34px"></div>
+    <div class="chip sk" style="width:150px;height:34px"></div>
+  </div>
+
+  <!-- 실제 데이터 -->
+  <div id="dataRow" class="row hide">
+    <div class="chip"><span>🌤 Temp</span><span>·</span><span id="temp" class="v">–</span><span>°C</span></div>
+    <div class="chip"><span>TSLA</span><span>·</span><span id="tsla" class="v">–</span></div>
+    <div class="chip"><span>£/€</span><span>·</span><span id="fx" class="v">–</span></div>
+  </div>
+
+  <div class="meta">
+    <span class="dot" id="dot"></span>
+    <span id="updated">업데이트 대기…</span>
+    <a class="link" href="http://127.0.0.1:8000/api/data" target="_blank" rel="noopener">JSON</a>
+  </div>
+
+  <div id="err" class="meta err hide">데이터 오류</div>
+</div>
+
+<script>
+  const API = "http://127.0.0.1:8000/api/data"; // ✅ 상대 경로
+  const AUTO_MS = 5 * 60 * 1000;              // 5분
+  const STALE_MS = 10 * 60 * 1000;            // 10분 지나면 경고 표시
+  let timer = null, countdown = null, nextAt = 0, loading = false, inflight = null;
+  
+  const el = {
+    skeleton: document.getElementById('skeleton'),
+    dataRow : document.getElementById('dataRow'),
+    err     : document.getElementById('err'),
+    temp    : document.getElementById('temp'),
+    tsla    : document.getElementById('tsla'),
+    fx      : document.getElementById('fx'),
+    updated : document.getElementById('updated'),
+    dot     : document.getElementById('dot'),
+    btn     : document.getElementById('btn'),
+    next    : document.getElementById('next'),
+  };
+  
+  // 지역화 숫자 압축(ko-KR에 맞춰 k/M/B)
+  const fmtCompact = new Intl.NumberFormat('ko-KR', { notation:'compact', maximumFractionDigits: 2 });
+  function compactNum(v){
+    if (v == null || v === "…") return "…";
+    const n = Number(String(v).replace(/[, ]/g,''));
+    if (Number.isNaN(n)) return v;
+    return fmtCompact.format(n);
+  }
+  function timeAgo(ts){
+    if(!ts) return '';
+    const s = Math.max(0, Math.floor(Date.now()/1000 - ts));
+    if (s<60) return `${s}s ago`;
+    const m = Math.floor(s/60); if (m<60) return `${m}m ago`;
+    const h = Math.floor(m/60); return `${h}h ago`;
+  }
+  function updateCountdown(){
+    const left = Math.max(0, nextAt - Date.now());
+    const s = Math.ceil(left/1000);
+    const m = Math.floor(s/60), r = s%60;
+    el.next.textContent = left ? `Auto refresh in ${m}:${String(r).padStart(2,'0')}` : 'Auto refresh soon';
+  }
+  
+  async function load(){
+    if (loading) return;
+    loading = true;
+  
+    // 버튼 상태
+    el.btn.disabled = true;
+    const old = el.btn.innerHTML;
+    el.btn.innerHTML = `<span class="spin" aria-hidden="true"></span> Refreshing`;
+  
+    // 타임아웃 + 이전 요청 취소
+    if (inflight) inflight.abort();
+    const ctl = new AbortController();
+    inflight = ctl;
+    const to = setTimeout(() => ctl.abort(), 8000); // 8초 타임아웃
+  
+    try{
+      const r = await fetch(API, { cache:'no-store', signal: ctl.signal });
+      clearTimeout(to);
+      if(!r.ok) throw new Error(r.statusText);
+      const j = await r.json();
+  
+      el.temp.textContent = (j.temperature_c ?? "…");
+      el.tsla.textContent = compactNum(j.tesla_usd);
+      el.fx.textContent   = (j.gbp_eur ?? "…");
+  
+      const ts = (j.updated || 0) * 1000;
+      const stale = Date.now() - ts > STALE_MS;
+  
+      el.updated.textContent = `Updated ${timeAgo(j.updated)} • ${new Date(ts).toLocaleTimeString('ko-KR', {hour12:false})}`;
+      el.dot.style.background = stale ? '#f59e0b' : '#22c55e'; // ✅ 오래되면 경고색
+  
+      // 표시 전환
+      el.skeleton.classList.add('hide');
+      el.dataRow.classList.remove('hide');
+      el.err.classList.add('hide');
+  
+      // 다음 자동 갱신 예약
+      if (timer) clearTimeout(timer);
+      if (countdown) clearInterval(countdown);
+      nextAt = Date.now() + AUTO_MS;
+      updateCountdown();
+      countdown = setInterval(updateCountdown, 1000);
+      timer = setTimeout(load, AUTO_MS);
+  
+    }catch(e){
+      el.dot.style.background = '#ef4444';
+      el.err.classList.remove('hide');
+      console.error(e);
+    }finally{
+      loading = false;
+      el.btn.disabled = false;
+      el.btn.innerHTML = old;
+      if (inflight === ctl) inflight = null;
+    }
+  }
+  
+  // 초기 로드 + 버튼 수동 새로고침
+  el.btn.setAttribute('aria-label','지금 새로고침');
+  load();
+  el.btn.addEventListener('click', () => load());
+  
+  // 탭이 다시 보일 때 즉시 동기화 (재방문 시 신선도 확보)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') load();
+  });
+  </script>
+</body>
+</html>
