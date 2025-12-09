@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>BYOB Vanilla JS Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #111;
+    }
+
+    .byob-page {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 16px 40px;
+    }
+
+    .byob-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .byob-header h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .byob-header p {
+      font-size: 14px;
+      color: #666;
+    }
+
+    /* === 레이아웃 (MO 기본) === */
+
+    .byob-layout {
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-areas:
+        "main"
+        "plus"
+        "addon"
+        "equal"
+        "summary";
+      gap: 16px;
+      background: #f0f2f6;
+      padding: 24px;
+      border-radius: 18px;
+    }
+
+    .product-card--main   { grid-area: main; }
+    .product-card--addon  { grid-area: addon; }
+    .byob-operator--plus  { grid-area: plus; }
+    .byob-operator--equal { grid-area: equal; }
+    #summary              { grid-area: summary; }
+
+    /* TAB: 메인+서브 / 아래에 요약 */
+    @media (min-width: 768px) {
+      .byob-layout {
+        grid-template-columns: 1.3fr auto 1.3fr;
+        grid-template-areas:
+          "main  plus   addon"
+          "equal equal  equal"
+          "summary summary summary";
+        align-items: stretch;
+      }
+    }
+
+    /* PC: 메인 + 서브 + 요약 3열 */
+    @media (min-width: 1100px) {
+      .byob-layout {
+        grid-template-columns: 1.3fr auto 1.3fr auto 1.2fr;
+        grid-template-areas:
+          "main plus addon equal summary";
+      }
+    }
+
+    .byob-operator {
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 2px solid #0074ff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 700;
+      background: #fff;
+      justify-self: center;
+      align-self: center;
+    }
+
+    /* === 카드 공통 스타일 === */
+
+    .product-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px 20px 16px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .product-card__carousel {
+      border-radius: 16px;
+      background: #f5f7fb;
+      padding: 12px;
+      position: relative;
+      margin-bottom: 16px;
+    }
+
+    .product-card__carousel-main {
+      border-radius: 12px;
+      overflow: hidden;
+      background: #e7ebf6;
+      height: 190px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .product-card__carousel-main img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .carousel-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      background: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .carousel-arrow--prev { left: 8px; }
+    .carousel-arrow--next { right: 8px; }
+
+    .carousel-dots {
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .carousel-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #d0d7e8;
+    }
+
+    .carousel-dot--active {
+      background: #0074ff;
+    }
+
+    .product-card__top-meta {
+      font-size: 11px;
+      color: #777;
+      display: flex;
+      gap: 8px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
+
+    .product-card__title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .product-card__subtitle {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .product-card__options {
+      margin-bottom: 14px;
+      font-size: 12px;
+    }
+
+    .option-label {
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .option-list {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .option-pill {
+      min-width: 48px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid #ccc;
+      text-align: center;
+      cursor: pointer;
+      font-size: 12px;
+      background: #fff;
+    }
+
+    .option-pill--selected {
+      border-color: #0074ff;
+      background: #e4f0ff;
+      color: #004699;
+      font-weight: 600;
+    }
+
+    .product-card__footer {
+      margin-top: auto;
+    }
+
+    .product-card__price-main {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .product-card__price-strike {
+      font-size: 12px;
+      color: #888;
+      text-decoration: line-through;
+      margin-right: 6px;
+    }
+
+    .product-card__save {
+      font-size: 12px;
+      color: #007f2d;
+      font-weight: 600;
+    }
+
+    /* === 요약 카드 === */
+
+    .summary-card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .summary-card__title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .summary-line {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      font-size: 12px;
+      margin-bottom: 10px;
+    }
+
+    .summary-line__name {
+      max-width: 70%;
+    }
+
+    .summary-line__price {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .summary-divider {
+      border-top: 1px solid #e2e4ea;
+      margin: 10px 0 12px;
+    }
+
+    .summary-total-label {
+      font-size: 12px;
+      color: #555;
+    }
+
+    .summary-total-price {
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .summary-per-month {
+      font-size: 11px;
+      color: #777;
+      margin-top: 4px;
+    }
+
+    .summary-old-save {
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .summary-old {
+      text-decoration: line-through;
+      color: #999;
+      margin-right: 4px;
+    }
+
+    .summary-save {
+      color: #007f2d;
+      font-weight: 600;
+    }
+
+    .summary-button {
+      margin-top: 14px;
+    }
+
+    .summary-button button {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 999px;
+      border: none;
+      background: #000;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .summary-button button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+<body>
+
+  <main class="byob-page">
+    <header class="byob-header">
+      <h1>Lorem Ipsum</h1>
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore.</p>
+    </header>
+
+    <section class="byob-layout">
+      <!-- 메인 상품 -->
+      <article class="product-card product-card--main" id="product-main">
+        <div class="product-card__carousel" data-carousel="main">
+          <div class="product-card__carousel-main">
+            <img src="" alt="" />
+          </div>
+          <div class="carousel-arrow carousel-arrow--prev" data-dir="prev">&#8249;</div>
+          <div class="carousel-arrow carousel-arrow--next" data-dir="next">&#8250;</div>
+          <div class="carousel-dots"></div>
+        </div>
+
+        <div class="product-card__top-meta">
+          <span>Product information sheet</span>
+          <span>Energy class B</span>
+        </div>
+
+        <div class="product-card__title" data-title>Main product</div>
+        <div class="product-card__subtitle" data-subtitle></div>
+
+        <div class="product-card__options">
+          <div class="option-label">Storage</div>
+          <div class="option-list" data-option-group="storage-main"></div>
+        </div>
+
+        <div class="product-card__footer">
+          <div class="product-card__price-main">
+            <span class="product-card__price-strike" data-old-price></span>
+            <span data-price></span>
+          </div>
+          <div class="product-card__save" data-save-text></div>
+        </div>
+      </article>
+
+      <!-- + -->
+      <div class="byob-operator byob-operator--plus">+</div>
+
+      <!-- 서브 상품 -->
+      <article class="product-card product-card--addon" id="product-addon">
+        <div class="product-card__carousel" data-carousel="addon">
+          <div class="product-card__carousel-main">
+            <img src="" alt="" />
+          </div>
+          <div class="carousel-arrow carousel-arrow--prev" data-dir="prev">&#8249;</div>
+          <div class="carousel-arrow carousel-arrow--next" data-dir="next">&#8250;</div>
+          <div class="carousel-dots"></div>
+        </div>
+
+        <div class="product-card__top-meta">
+          <span>Compatible accessory</span>
+        </div>
+
+        <div class="product-card__title" data-title>Add-on product</div>
+        <div class="product-card__subtitle" data-subtitle></div>
+
+        <div class="product-card__options">
+          <div class="option-label">Colour</div>
+          <div class="option-list" data-option-group="color-addon"></div>
+        </div>
+
+        <div class="product-card__footer">
+          <div class="product-card__price-main">
+            <span class="product-card__price-strike" data-old-price></span>
+            <span data-price></span>
+          </div>
+          <div class="product-card__save" data-save-text></div>
+        </div>
+      </article>
+
+      <!-- = -->
+      <div class="byob-operator byob-operator--equal">=</div>
+
+      <!-- 요약 -->
+      <aside class="summary-card" id="summary">
+        <div class="summary-card__title">Your bundle</div>
+
+        <div class="summary-line" data-summary-line="main">
+          <div class="summary-line__name"></div>
+          <div class="summary-line__price"></div>
+        </div>
+
+        <div class="summary-line" data-summary-line="addon">
+          <div class="summary-line__name"></div>
+          <div class="summary-line__price"></div>
+        </div>
+
+        <div class="summary-divider"></div>
+
+        <div>
+          <div class="summary-total-label">Total price</div>
+          <div class="summary-total-price" id="summary-total-price"></div>
+          <div class="summary-per-month">From £18.31 / mo. (example)</div>
+          <div class="summary-old-save">
+            <span class="summary-old" id="summary-old-price"></span>
+            <span class="summary-save" id="summary-save-text"></span>
+          </div>
+        </div>
+
+        <div class="summary-button">
+          <button type="button">Add to basket</button>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    const mainProduct = {
+      name: "Galaxy S25",
+      subtitle: "Blueblack, 256 GB",
+      basePrice: 659,
+      oldPrice: 859,
+      storageOptions: [
+        { label: "128 GB", extra: -40 },
+        { label: "256 GB", extra: 0, default: true },
+        { label: "512 GB", extra: 120 }
+      ],
+      images: [
+        "https://via.placeholder.com/320x220?text=S25+Front",
+        "https://via.placeholder.com/320x220?text=S25+Back",
+        "https://via.placeholder.com/320x220?text=S25+Side"
+      ]
+    };
+
+    const addonProduct = {
+      name: "Galaxy Buds3 Pro",
+      subtitle: "Silver",
+      basePrice: 0,
+      oldPrice: 139,
+      colorOptions: [
+        { label: "Silver", extra: 0, default: true },
+        { label: "Black", extra: 0 },
+        { label: "White", extra: 0 }
+      ],
+      images: [
+        "https://via.placeholder.com/320x220?text=Buds3+Front",
+        "https://via.placeholder.com/320x220?text=Buds3+Case",
+        "https://via.placeholder.com/320x220?text=Buds3+Side"
+      ]
+    };
+
+    function formatPrice(value) {
+      if (value === 0) return "free";
+      return "£" + value.toFixed(2);
+    }
+
+    function initProductCard(cardEl, product, type) {
+      cardEl.querySelector("[data-title]").textContent = product.name;
+      cardEl.querySelector("[data-subtitle]").textContent = product.subtitle;
+
+      if (type === "main") {
+        const group = cardEl.querySelector('[data-option-group="storage-main"]');
+        product.storageOptions.forEach((opt, index) => {
+          const pill = document.createElement("button");
+          pill.type = "button";
+          pill.className = "option-pill";
+          pill.textContent = opt.label;
+          pill.dataset.index = index;
+          if (opt.default) pill.classList.add("option-pill--selected");
+          group.appendChild(pill);
+        });
+      } else {
+        const group = cardEl.querySelector('[data-option-group="color-addon"]');
+        product.colorOptions.forEach((opt, index) => {
+          const pill = document.createElement("button");
+          pill.type = "button";
+          pill.className = "option-pill";
+          pill.textContent = opt.label;
+          pill.dataset.index = index;
+          if (opt.default) pill.classList.add("option-pill--selected");
+          group.appendChild(pill);
+        });
+      }
+
+      const priceEl = cardEl.querySelector("[data-price]");
+      const oldPriceEl = cardEl.querySelector("[data-old-price]");
+      const saveTextEl = cardEl.querySelector("[data-save-text]");
+
+      priceEl.textContent = formatPrice(product.basePrice);
+      if (product.oldPrice) {
+        oldPriceEl.textContent = formatPrice(product.oldPrice);
+        const save = product.oldPrice - product.basePrice;
+        if (save > 0) saveTextEl.textContent = "Save " + formatPrice(save);
+      } else {
+        oldPriceEl.textContent = "";
+        saveTextEl.textContent = "";
+      }
+
+      const carouselEl = cardEl.querySelector(".product-card__carousel");
+      initCarousel(carouselEl, product.images);
+    }
+
+    function initCarousel(carouselEl, images) {
+      const imgEl = carouselEl.querySelector("img");
+      const dotsContainer = carouselEl.querySelector(".carousel-dots");
+      let index = 0;
+
+      function render() {
+        imgEl.src = images[index];
+        imgEl.alt = "Image " + (index + 1);
+        dotsContainer.innerHTML = "";
+        images.forEach((_, i) => {
+          const dot = document.createElement("div");
+          dot.className = "carousel-dot" + (i === index ? " carousel-dot--active" : "");
+          dotsContainer.appendChild(dot);
+        });
+      }
+
+      carouselEl.querySelectorAll(".carousel-arrow").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const dir = btn.dataset.dir;
+          if (dir === "prev") {
+            index = (index - 1 + images.length) % images.length;
+          } else {
+            index = (index + 1) % images.length;
+          }
+          render();
+        });
+      });
+
+      render();
+    }
+
+    function setupOptionHandlers() {
+      const mainCard = document.getElementById("product-main");
+      mainCard.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("option-pill")) return;
+        const group = mainCard.querySelector('[data-option-group="storage-main"]');
+        group.querySelectorAll(".option-pill").forEach(p => p.classList.remove("option-pill--selected"));
+        e.target.classList.add("option-pill--selected");
+
+        const index = Number(e.target.dataset.index);
+        const opt = mainProduct.storageOptions[index];
+        const price = mainProduct.basePrice + opt.extra;
+
+        const priceEl = mainCard.querySelector("[data-price]");
+        const oldPriceEl = mainCard.querySelector("[data-old-price]");
+        const saveTextEl = mainCard.querySelector("[data-save-text]");
+
+        priceEl.textContent = formatPrice(price);
+        if (mainProduct.oldPrice) {
+          oldPriceEl.textContent = formatPrice(mainProduct.oldPrice);
+          const save = mainProduct.oldPrice - price;
+          saveTextEl.textContent = save > 0 ? "Save " + formatPrice(save) : "";
+        }
+        updateSummary();
+      });
+
+      const addonCard = document.getElementById("product-addon");
+      addonCard.addEventListener("click", (e) => {
+        if (!e.target.classList.contains("option-pill")) return;
+        const group = addonCard.querySelector('[data-option-group="color-addon"]');
+        group.querySelectorAll(".option-pill").forEach(p => p.classList.remove("option-pill--selected"));
+        e.target.classList.add("option-pill--selected");
+        updateSummary();
+      });
+    }
+
+    function getCurrentPrice(cardEl) {
+      const text = cardEl.querySelector("[data-price]").textContent.trim();
+      if (text.toLowerCase() === "free") return 0;
+      const number = parseFloat(text.replace(/[£,]/g, ""));
+      return isNaN(number) ? 0 : number;
+    }
+
+    function updateSummary() {
+      const mainCard = document.getElementById("product-main");
+      const addonCard = document.getElementById("product-addon");
+
+      const mainPrice = getCurrentPrice(mainCard);
+      const addonPrice = getCurrentPrice(addonCard);
+      const total = mainPrice + addonPrice;
+
+      const mainLine = document.querySelector('[data-summary-line="main"]');
+      const addonLine = document.querySelector('[data-summary-line="addon"]');
+
+      const mainOpt = mainCard.querySelector(".option-pill--selected")?.textContent || "";
+      mainLine.querySelector(".summary-line__name").textContent =
+        mainProduct.name + (mainOpt ? " - " : "") + mainOpt;
+      mainLine.querySelector(".summary-line__price").textContent = formatPrice(mainPrice);
+
+      const addonOpt = addonCard.querySelector(".option-pill--selected")?.textContent || "";
+      addonLine.querySelector(".summary-line__name").textContent =
+        addonProduct.name + (addonOpt ? " - " : "") + addonOpt;
+      addonLine.querySelector(".summary-line__price").textContent = formatPrice(addonPrice);
+
+      document.getElementById("summary-total-price").textContent = formatPrice(total);
+
+      const oldTotal = mainProduct.oldPrice + addonProduct.oldPrice;
+      document.getElementById("summary-old-price").textContent = formatPrice(oldTotal);
+      const save = oldTotal - total;
+      document.getElementById("summary-save-text").textContent =
+        save > 0 ? "Save " + formatPrice(save) : "";
+    }
+
+    initProductCard(document.getElementById("product-main"), mainProduct, "main");
+    initProductCard(document.getElementById("product-addon"), addonProduct, "addon");
+    setupOptionHandlers();
+    updateSummary();
+  </script>
+
+</body>
+</html>

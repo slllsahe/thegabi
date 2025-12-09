@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FT32 Daily Ranking</title>
+  <style>
+    :root {
+      --bg: #0f1116;
+      --card: #171a21;
+      --muted: #8b93a7;
+      --text: #e5e7ef;
+      --accent: #4f7cff;
+      --accent-2: #21c995;
+      --divider: #232634;
+      --chip: #1f2330;
+      --win: #1e2a1f;
+      --lose: #2a1e1e;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 960px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--divider);
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 18px;
+    }
+    .subtitle { color: var(--muted); font-weight: 500; font-size: 12px; }
+    .chip {
+      background: var(--chip);
+      color: var(--muted);
+      border: 1px solid var(--divider);
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ranking {
+      display: grid;
+      grid-template-columns: 1fr;
+    }
+    .row {
+      display: grid;
+      grid-template-columns: 56px 1fr 120px 96px;
+      gap: 12px;
+      align-items: center;
+      padding: 14px 24px;
+      border-bottom: 1px solid var(--divider);
+    }
+    .row:last-child { border-bottom: 0; }
+
+    .rank {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #111522;
+      color: var(--accent);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .name {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 600;
+    }
+    .name .tag { color: var(--muted); font-weight: 500; font-size: 12px; }
+
+    .delta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 600;
+      color: var(--accent-2);
+      background: var(--win);
+      padding: 4px 8px;
+      border-radius: 8px;
+      justify-self: start;
+    }
+    .delta.down { color: #ff6b6b; background: var(--lose); }
+
+    .score {
+      text-align: right;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .end {
+      text-align: center;
+      color: var(--muted);
+      padding: 18px 16px 22px;
+      border-top: 1px dashed var(--divider);
+      font-size: 12px;
+      letter-spacing: 0.2px;
+    }
+
+    @media (max-width: 640px) {
+      .row { grid-template-columns: 40px 1fr auto; }
+      .score { display: none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card" aria-label="FT32 Daily Ranking">
+      <div class="header">
+        <div class="title">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2l2.4 4.86 5.36.78-3.88 3.78.92 5.36L12 14.9 7.2 16.78l.92-5.36L4.24 7.64l5.36-.78L12 2z" stroke="currentColor" stroke-width="1.5"/></svg>
+          <span>Daily Ranking</span>
+        </div>
+        <span class="chip" title="Default_End state">Status: Default_End</span>
+      </div>
+
+      <div class="ranking" role="list">
+        <div class="row" role="listitem">
+          <div class="rank">1</div>
+          <div class="name">Alpha Studio <span class="tag">TV</span></div>
+          <div class="delta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>+2</div>
+          <div class="score">98,240</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">2</div>
+          <div class="name">Beta Media <span class="tag">OTT</span></div>
+          <div class="delta down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10l-6 6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>-1</div>
+          <div class="score">95,012</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">3</div>
+          <div class="name">Gamma Labs <span class="tag">Web</span></div>
+          <div class="delta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>+3</div>
+          <div class="score">92,304</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">4</div>
+          <div class="name">Delta Corp <span class="tag">CTV</span></div>
+          <div class="delta down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10l-6 6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>-2</div>
+          <div class="score">89,771</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">5</div>
+          <div class="name">Epsilon Group <span class="tag">App</span></div>
+          <div class="delta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>+1</div>
+          <div class="score">87,420</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">6</div>
+          <div class="name">Zeta Digital <span class="tag">Web</span></div>
+          <div class="delta down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10l-6 6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>-1</div>
+          <div class="score">84,193</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">7</div>
+          <div class="name">Theta Networks <span class="tag">OTT</span></div>
+          <div class="delta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>+4</div>
+          <div class="score">80,552</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">8</div>
+          <div class="name">Iota Studios <span class="tag">CTV</span></div>
+          <div class="delta down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10l-6 6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>-1</div>
+          <div class="score">78,009</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">9</div>
+          <div class="name">Kappa House <span class="tag">App</span></div>
+          <div class="delta"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 14l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>+1</div>
+          <div class="score">75,662</div>
+        </div>
+        <div class="row" role="listitem">
+          <div class="rank">10</div>
+          <div class="name">Lambda Media <span class="tag">TV</span></div>
+          <div class="delta down"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M18 10l-6 6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>-3</div>
+          <div class="score">72,114</div>
+        </div>
+      </div>
+
+      <div class="end" aria-live="polite">Youve reached the end of todays ranking</div>
+    </section>
+  </main>
+</body>
+</html>
+
+

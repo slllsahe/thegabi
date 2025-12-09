@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Daily Ranking Rolling Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+      background: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .rolling-section {
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 16px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 320px;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .rolling {
+      position: relative;
+      overflow: hidden;
+      height: 28px; /* 한 줄 높이 */
+      border-radius: 6px;
+    }
+
+    .rolling-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      will-change: transform;
+    }
+
+    .rolling-item {
+      height: 28px;
+      line-height: 28px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      padding-inline: 4px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .rolling-list {
+        transition: none !important;
+        transform: translateY(0) !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <section class="rolling-section" aria-label="Daily Ranking">
+    <div class="title">📈 Daily Ranking</div>
+    <div class="rolling">
+      <ul class="rolling-list" role="list">
+        <li class="rolling-item">1. Galaxy S24 Ultra</li>
+        <li class="rolling-item">2. Galaxy Z Flip</li>
+        <li class="rolling-item">3. Galaxy Buds3 Pro</li>
+        <li class="rolling-item">4. The Frame TV</li>
+        <li class="rolling-item">5. Bespoke Jet AI</li>
+      </ul>
+    </div>
+  </section>
+
+  <script>
+    (function () {
+      const interval = 2000;       // 2s
+      const slideDuration = 400;   // 0.4s
+
+      const root = document.querySelector('.rolling-section');
+      const viewport = root.querySelector('.rolling');
+      const list = root.querySelector('.rolling-list');
+      if (!viewport || !list) return;
+
+      const mql = window.matchMedia('(prefers-reduced-motion: reduce)');
+      if (mql.matches) return;
+
+      let paused = false;
+      viewport.addEventListener('mouseenter', () => paused = true);
+      viewport.addEventListener('mouseleave', () => paused = false);
+      viewport.addEventListener('focusin',   () => paused = true);
+      viewport.addEventListener('focusout',  () => paused = false);
+
+      const items = Array.from(list.children);
+      if (items.length <= 1) return;
+
+      const itemHeight = items[0].getBoundingClientRect().height;
+      const firstClone = items[0].cloneNode(true);
+      list.appendChild(firstClone);
+
+      let index = 0;
+      let ticking = false;
+
+      function goTo(i, withAnim = true) {
+        list.style.transition = withAnim ? `transform ${slideDuration}ms ease` : 'none';
+        list.style.transform = `translateY(${-i * itemHeight}px)`;
+      }
+
+      function step() {
+        if (paused || ticking) return;
+        ticking = true;
+
+        index += 1;
+        goTo(index, true);
+
+        setTimeout(() => {
+          if (index >= items.length) {
+            index = 0;
+            goTo(0, false);
+          }
+          ticking = false;
+        }, slideDuration + 20);
+      }
+
+      goTo(0, false);
+      const timer = setInterval(step, interval);
+
+      window.addEventListener('pagehide', () => clearInterval(timer));
+    })();
+  </script>
+</body>
+</html>

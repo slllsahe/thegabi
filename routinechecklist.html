@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Longevity Daily Checklist</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+      background: #0b1120;
+      color: #e5e7eb;
+      line-height: 1.5;
+    }
+
+    .app-container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 16px 16px 40px;
+    }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.4rem;
+      text-align: center;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.9rem;
+      color: #9ca3af;
+      margin-bottom: 0.6rem;
+    }
+
+    .field-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 16px;
+      justify-content: center;
+    }
+
+    .nav-tab {
+      border: 1px solid #374151;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 6px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+      white-space: nowrap;
+    }
+
+    .nav-tab.active {
+      background: #2563eb;
+      border-color: #3b82f6;
+      color: #f9fafb;
+    }
+
+    .nav-tab:hover { border-color: #4b5563; }
+
+    section {
+      margin-bottom: 24px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #020617;
+      border: 1px solid #1f2937;
+    }
+
+    section h2 {
+      margin-top: 0;
+      margin-bottom: 8px;
+      font-size: 1.05rem;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    section h3 {
+      margin-top: 16px;
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+      color: #9ca3af;
+    }
+
+    .section-tag {
+      font-size: 0.7rem;
+      padding: 2px 6px;
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      color: #9ca3af;
+    }
+
+    .field-row label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+
+    input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    select,
+    textarea {
+      background: #020617;
+      border-radius: 999px;
+      border: 1px solid #374151;
+      color: #e5e7eb;
+      padding: 4px 10px;
+      font-size: 0.85rem;
+      min-width: 120px;
+    }
+
+    textarea {
+      border-radius: 10px;
+      width: 100%;
+      min-height: 60px;
+      resize: vertical;
+      padding: 8px 10px;
+    }
+
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    .time-label {
+      font-size: 0.85rem;
+      color: #9ca3af;
+    }
+
+    .note {
+      font-size: 0.8rem;
+      color: #6b7280;
+      margin-top: 4px;
+      margin-bottom: 4px;
+    }
+
+    .buttons-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      justify-content: flex-end;
+    }
+
+    button {
+      border-radius: 999px;
+      border: 1px solid #4b5563;
+      background: #111827;
+      color: #e5e7eb;
+      padding: 6px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.05s;
+    }
+
+    button.small {
+      padding: 4px 10px;
+      font-size: 0.8rem;
+    }
+
+    button:hover {
+      background: #1f2937;
+      border-color: #6b7280;
+    }
+
+    button:active { transform: scale(0.97); }
+
+    .btn-primary {
+      background: #2563eb;
+      border-color: #3b82f6;
+    }
+
+    .btn-primary:hover { background: #1d4ed8; }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+      background: #111827;
+      border-color: #374151;
+    }
+
+    .summary-box {
+      margin-top: 12px;
+      border-radius: 12px;
+      background: #020617;
+      border: 1px solid #1f2937;
+      padding: 10px 12px;
+      font-size: 0.85rem;
+      white-space: pre-wrap;
+    }
+
+    @media (max-width: 640px) {
+      .app-container { padding: 10px 10px 32px; }
+      section { padding: 12px; }
+      .field-row { align-items: flex-start; }
+      select { min-width: 100px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <h1>Longevity Daily Checklist</h1>
+    <p class="subtitle">
+      Huberman · Bryan Johnson · David Sinclair 루틴 기반 일일 체크리스트
+    </p>
+
+    <div class="nav-tabs">
+      <button class="nav-tab active" data-target="morning">아침</button>
+      <button class="nav-tab" data-target="midday">정오</button>
+      <button class="nav-tab" data-target="afternoon">오후</button>
+      <button class="nav-tab" data-target="evening">저녁</button>
+      <button class="nav-tab" data-target="night">밤/수면</button>
+    </div>
+
+    <!-- Morning -->
+    <section id="morning" data-stage="morning">
+      <h2>
+        Morning Routine
+        <span class="section-tag">기상 직후 ~ 오전</span>
+      </h2>
+
+      <h3>1.1 기상 기록 + 아침 기본 루틴</h3>
+
+      <div class="field-row">
+        <span class="time-label">기상 시간</span>
+        <select id="wake_time" class="time-select"></select>
+      </div>
+      <div class="field-row">
+        <label>
+          <input type="checkbox" id="wake_no_phone" />
+          기상 직후 5분 동안 스마트폰 사용 안 함
+        </label>
+      </div>
+
+      <div class="field-row" style="margin-top:8px;">
+        <strong>수분 + 전해질 (최우선)</strong>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="morning_water" /> 물 300–500ml 마셨다</label>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="morning_electrolyte" /> 전해질 섭취</label>
+      </div>
+      <div class="field-row">
+  <label>
+    <input type="checkbox" id="morning_cold_shower" />
+    1–3분 찬물 샤워 / 냉수 샤워 완료
+  </label>
+</div>
+
+
+      <div class="field-row" style="margin-top:8px;">
+        <strong>햇빛 노출 (Huberman)</strong>
+      </div>
+      <div class="field-row">
+        <label>
+          <input type="checkbox" id="sunlight_done" />
+          아침에 햇빛 노출 10–20분 이상 (실내 조명 제외)
+        </label>
+      </div>
+      <p class="note">흐린 날은 20–30분 정도, 가능한 한 야외에서 노출.</p>
+
+      <div class="field-row" style="margin-top:8px;">
+        <strong>가벼운 아침 루틴</strong>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="light_activity_walk" /> 10–15분 산책 / 가벼운 유산소</label>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="light_activity_stretch" /> 스트레칭</label>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="light_activity_breath" /> 짧은 명상 / 호흡</label>
+      </div>
+
+      <div class="field-row" style="margin-top:8px;">
+        <strong>AM 스킨케어 (Bryan Johnson 스타일)</strong>
+      </div>
+      <div class="field-row"><label><input type="checkbox" id="am_cleanse" /> 세안</label></div>
+      <div class="field-row"><label><input type="checkbox" id="am_vitc" /> 비타민 C / 항산화 세럼</label></div>
+      <div class="field-row"><label><input type="checkbox" id="am_spf" /> SPF 30–50 선크림</label></div>
+      <div class="field-row"><label><input type="checkbox" id="am_moisturizer" /> 보습제</label></div>
+
+      <h3>1.2 옵션* 카페인 섭취 (기상 후 90–120분)</h3>
+      <div class="field-row">
+        <span class="time-label">카페인 섭취 시간</span>
+        <select id="caffeine_time" class="time-select"></select>
+      </div>
+    </section>
+
+    <!-- Midday -->
+    <section id="midday" data-stage="midday" style="display:none;">
+      <h2>
+        Midday Routine
+        <span class="section-tag">정오 ~ 오후 4시</span>
+      </h2>
+
+      <h3>2.1 첫 끼 기록</h3>
+      <div class="field-row">
+        <span class="time-label">첫 끼 식사 시간</span>
+        <select id="first_meal_time" class="time-select"></select>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="first_meal_protein" /> 단백질 30g 이상</label>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="first_meal_low_glycemic" /> 혈당 스파이크를 줄이려는 노력을 했다 (천천히 먹기 / 단백질·섬유 먼저 / 당·정제탄수 최소화)</label>
+      </div>
+      <div class="field-row">
+        <label><input type="checkbox" id="first_meal_plant_based" /> 식물성 식단 / 섬유질 포함</label>
+      </div>
+
+      <h3>2.2 첫 끼 이후 보충제</h3>
+      <div class="field-row"><label><input type="checkbox" id="supp_vitd" /> 비타민 D</label></div>
+      <div class="field-row"><label><input type="checkbox" id="supp_omega3" /> 오메가3</label></div>
+      <div class="field-row"><label><input type="checkbox" id="supp_multi" /> 멀티비타민</label></div>
+      <div class="field-row"><label><input type="checkbox" id="supp_b12" /> 비타민 B12</label></div>
+      <div class="field-row"><label><input type="checkbox" id="supp_polyphenol" /> 폴리페놀</label></div>
+      <div class="field-row"><label><input type="checkbox" id="supp_nmn_nr" /> NR / NMN (선택)</label></div>
+      <div class="field-row"><label><input type="checkbox" id="supp_creatine" /> 크레아틴</label></div>
+
+      <!-- 커스텀 보충제 체크리스트 -->
+      <div class="field-row" style="margin-top:8px;">
+        <strong>기타 보충제</strong>
+      </div>
+      <div id="supp_custom_list"></div>
+
+      <!-- 입력 + 추가 버튼 -->
+      <div class="field-row" style="align-items:flex-start; margin-top:4px;">
+        <textarea id="supp_other" placeholder="예: 코큐텐, 레스베라트롤 등 (Enter 또는 '추가' 버튼)"></textarea>
+        <button type="button" id="supp_other_add" class="small">추가</button>
+      </div>
+
+      <h3>2.3 집중 업무 / 학습</h3>
+      <div class="field-row"><label><input type="checkbox" id="deep_work_1" /> 60–90분 집중 세션 1회</label></div>
+      <div class="field-row"><label><input type="checkbox" id="deep_work_2" /> 60–90분 집중 세션 2회</label></div>
+      <div class="field-row"><label><input type="checkbox" id="midday_daylight_walk" /> 낮 시간 자연광 산책 10분</label></div>
+
+    </section>
+
+    <!-- Afternoon -->
+    <section id="afternoon" data-stage="afternoon" style="display:none;">
+      <h2>
+        Afternoon Routine
+        <span class="section-tag">오후 4시 ~ 7시</span>
+      </h2>
+
+      <h3>3.1 운동 (메인 운동)</h3>
+      <div class="field-row">
+        <span class="time-label">운동 시작 시간</span>
+        <select id="workout_time" class="time-select"></select>
+      </div>
+      <div class="field-row">
+        <label for="workout_type">오늘 운동 유형</label>
+        <select id="workout_type">
+          <option value="">-- 선택하세요 --</option>
+          <option value="strength">근력</option>
+          <option value="cardio">유산소</option>
+          <option value="recovery">회복</option>
+        </select>
+      </div>
+
+      <h3>3.2 운동 후 루틴</h3>
+      <div class="field-row"><label><input type="checkbox" id="postwo_protein" /> 단백질 30g 이상 섭취</label></div>
+      <div class="field-row"><label><input type="checkbox" id="postwo_creatine" /> 크레아틴 섭취</label></div>
+      <div class="field-row"><label><input type="checkbox" id="postwo_electrolyte" /> 전해질 / 수분 재보충</label></div>
+
+      <h3>3.3 피부 회복 루틴</h3>
+      <div class="field-row"><label><input type="checkbox" id="afternoon_shower" /> 샤워 / 세안</label></div>
+      <div class="field-row"><label><input type="checkbox" id="afternoon_spf_reapply" /> SPF 재도포</label></div>
+    </section>
+
+    <!-- Evening -->
+    <section id="evening" data-stage="evening" style="display:none;">
+      <h2>
+        Evening Routine
+        <span class="section-tag">저녁 7시 ~ 10시</span>
+      </h2>
+
+      <h3>4.1 저녁 식사</h3>
+      <div class="field-row">
+        <span class="time-label">저녁 식사 시간</span>
+        <select id="dinner_time" class="time-select"></select>
+      </div>
+      <div class="field-row"><label><input type="checkbox" id="dinner_protein" /> 단백질 포함</label></div>
+      <div class="field-row"><label><input type="checkbox" id="dinner_low_sugar" /> 혈당 스파이크를 줄이려는 노력을 했다 (천천히 먹기 / 단백질·섬유 먼저 / 당·정제탄수 최소화)</label></div>
+      <div class="field-row"><label><input type="checkbox" id="dinner_not_overeat" /> 과식하지 않았다</label></div>
+
+      <h3>4.2 저녁 보충제</h3>
+      <div class="field-row"><label><input type="checkbox" id="evening_magnesium" /> 마그네슘</label></div>
+      <div class="field-row"><label><input type="checkbox" id="evening_glycine" /> 글리신</label></div>
+      <div class="field-row"><label><input type="checkbox" id="evening_theanine" /> 테아닌</label></div>
+      <div class="field-row"><label><input type="checkbox" id="evening_vinegar_honey" /> 식초 / 소량의 꿀</label></div>
+
+      <h3>4.3 저녁 스킨케어</h3>
+      <div class="field-row"><label><input type="checkbox" id="pm_cleanse" /> 세안</label></div>
+      <div class="field-row"><label><input type="checkbox" id="pm_retinol" /> 레티놀 사용</label></div>
+      <div class="field-row"><label><input type="checkbox" id="pm_moisturizer" /> 보습제</label></div>
+      <div class="field-row"><label><input type="checkbox" id="pm_neck_hands" /> 전신 스킨케어</label></div>
+    </section>
+
+    <!-- Night -->
+    <section id="night" data-stage="night" style="display:none;">
+      <h2>
+        Night Routine
+        <span class="section-tag">취침 전</span>
+      </h2>
+
+      <h3>5.1 수면 준비</h3>
+      <div class="field-row"><label><input type="checkbox" id="sleep_lights_low" /> 조명 최소화</label></div>
+      <div class="field-row"><label><input type="checkbox" id="sleep_temp_ok" /> 방 온도 18–20도</label></div>
+      <div class="field-row"><label><input type="checkbox" id="sleep_phone_away" /> 스마트폰 치워두기</label></div>
+
+      <h3>5.2 취침 기록</h3>
+      <div class="field-row">
+        <span class="time-label">취침 시간</span>
+        <select id="sleep_time" class="time-select"></select>
+      </div>
+      <div class="field-row"><label><input type="checkbox" id="sleep_goal" /> 7–9시간 수면 목표</label></div>
+
+      <div class="buttons-row">
+        <button class="btn-primary" id="generate_summary" disabled>오늘 요약 보기</button>
+        <button id="reset_day">오늘 기록 초기화</button>
+      </div>
+
+      <div id="summary" class="summary-box" style="display:none;"></div>
+    </section>
+  </div>
+
+<script>
+  // ---- Time options ----
+  let TIME_OPTIONS = [];
+
+  function initTimeOptions() {
+    TIME_OPTIONS = [];
+    for (let h = 0; h < 24; h++) {
+      for (let m = 0; m < 60; m += 30) {
+        const hh = String(h).padStart(2, "0");
+        const mm = String(m).padStart(2, "0");
+        TIME_OPTIONS.push(`${hh}:${mm}`);
+      }
+    }
+  }
+
+  function timeToMinutes(str) {
+    if (!str) return null;
+    const [hh, mm] = str.split(":").map(Number);
+    return hh * 60 + mm;
+  }
+
+  function buildOptionsForSelect(selectEl, minTimeStr) {
+    const prevValue = selectEl.value;
+    selectEl.innerHTML = "";
+
+    const emptyOpt = document.createElement("option");
+    emptyOpt.value = "";
+    emptyOpt.textContent = "-- 시간 선택 --";
+    selectEl.appendChild(emptyOpt);
+
+    const minMinutes =
+      minTimeStr && minTimeStr !== "" ? timeToMinutes(minTimeStr) : null;
+
+    let currentStillValid = false;
+
+    TIME_OPTIONS.forEach((t) => {
+      if (minMinutes !== null && timeToMinutes(t) < minMinutes) return;
+      const opt = document.createElement("option");
+      opt.value = t;
+      opt.textContent = t;
+      if (t === prevValue) {
+        opt.selected = true;
+        currentStillValid = true;
+      }
+      selectEl.appendChild(opt);
+    });
+
+    if (!currentStillValid) {
+      selectEl.value = "";
+    }
+  }
+
+  const STAGE_ORDER = ["morning", "midday", "afternoon", "evening", "night"];
+
+  function recomputeTimeConstraints() {
+    let latestTimeStr = "";
+
+    STAGE_ORDER.forEach((stageId) => {
+      const section = document.getElementById(stageId);
+      if (!section) return;
+
+      const selects = section.querySelectorAll("select.time-select");
+      selects.forEach((sel) => buildOptionsForSelect(sel, latestTimeStr));
+
+      selects.forEach((sel) => {
+        if (sel.value) {
+          if (!latestTimeStr) latestTimeStr = sel.value;
+          else {
+            const cur = timeToMinutes(sel.value);
+            const prev = timeToMinutes(latestTimeStr);
+            if (cur !== null && prev !== null && cur > prev) {
+              latestTimeStr = sel.value;
+            }
+          }
+        }
+      });
+    });
+  }
+
+  function populateTimeSelects() {
+    const selects = document.querySelectorAll("select.time-select");
+    selects.forEach((sel) => buildOptionsForSelect(sel, null));
+  }
+
+  // ---- State ----
+  const STORAGE_KEY = "longevityChecklistState_v13";
+  const CUSTOM_SUPP_KEY = "longevityCustomSupp_v1";
+
+  function getAllControls() {
+    return document.querySelectorAll("input[id], select[id], textarea[id]");
+  }
+
+  function loadState() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const state = JSON.parse(raw);
+      const els = getAllControls();
+      els.forEach((el) => {
+        const id = el.id;
+        if (!id || !(id in state)) return;
+        const value = state[id];
+        if (el.type === "checkbox") el.checked = !!value;
+        else if (el.tagName === "SELECT" || el.tagName === "TEXTAREA")
+          el.value = value ?? "";
+      });
+    } catch (e) {
+      console.warn("State load error", e);
+    }
+  }
+
+  function saveState() {
+    const els = getAllControls();
+    const state = {};
+    els.forEach((el) => {
+      const id = el.id;
+      if (!id) return;
+      if (el.type === "checkbox") state[id] = el.checked;
+      else if (el.tagName === "SELECT" || el.tagName === "TEXTAREA")
+        state[id] = el.value;
+    });
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+  }
+
+  // ---- Custom supplements ----
+  function loadCustomSuppList() {
+    try {
+      const raw = localStorage.getItem(CUSTOM_SUPP_KEY);
+      if (!raw) return [];
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr)) return arr;
+      return [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveCustomSuppList(list) {
+    localStorage.setItem(CUSTOM_SUPP_KEY, JSON.stringify(list));
+  }
+
+  function renderCustomSupplements(list) {
+    const container = document.getElementById("supp_custom_list");
+    if (!container) return;
+    container.innerHTML = "";
+    list.forEach((text, idx) => {
+      const row = document.createElement("div");
+      row.className = "field-row";
+
+      const label = document.createElement("label");
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.id = `supp_custom_${idx}`;
+      cb.classList.add("supp-custom-item");
+
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(" " + text));
+
+      row.appendChild(label);
+      container.appendChild(row);
+
+      cb.addEventListener("change", () => {
+        saveState();
+        updateSummaryButtonState();
+      });
+    });
+  }
+
+  function addCustomSupplementFromInput() {
+    const input = document.getElementById("supp_other");
+    if (!input) return;
+    const text = input.value.trim();
+    if (!text) return;
+
+    const list = loadCustomSuppList();
+
+    // 이미 같은 이름이 있으면 추가하지 않음 (중복 방지)
+    if (list.some((item) => item === text)) {
+      input.value = "";
+      return;
+    }
+
+    list.push(text);
+    saveCustomSuppList(list);
+    renderCustomSupplements(list);
+    saveState();
+
+    input.value = "";
+  }
+
+  // ---- Waterfall gating: 섹션별 "시간 + 아무 체크 1개" ----
+  const stageMainTime = {
+    morning: "wake_time",
+    midday: "first_meal_time",
+    afternoon: "workout_time",
+    evening: "dinner_time",
+    night: "sleep_time",
+  };
+
+  function isStageComplete(stageId) {
+    const section = document.querySelector(`section[data-stage="${stageId}"]`);
+    if (!section) return true;
+
+    const timeId = stageMainTime[stageId];
+    let timeOk = true;
+
+    if (timeId) {
+      const tEl = document.getElementById(timeId);
+      timeOk = !!(tEl && tEl.value);
+    }
+
+    const anyChecked = !!section.querySelector('input[type="checkbox"]:checked');
+
+    return timeOk && anyChecked;
+  }
+
+  function updateSummaryButtonState() {
+    const btn = document.getElementById("generate_summary");
+    if (!btn) return;
+    const enabled = isStageComplete("night");
+    btn.disabled = !enabled;
+  }
+
+  function attachChangeListeners() {
+    const els = getAllControls();
+    els.forEach((el) => {
+      if (el.type === "checkbox") {
+        el.addEventListener("change", () => {
+          saveState();
+          updateSummaryButtonState();
+        });
+      } else if (el.tagName === "SELECT") {
+        el.addEventListener("change", () => {
+          saveState();
+          if (el.classList.contains("time-select")) {
+            recomputeTimeConstraints();
+          }
+          updateSummaryButtonState();
+        });
+      } else if (el.tagName === "TEXTAREA") {
+        el.addEventListener("input", () => {
+          saveState();
+          updateSummaryButtonState();
+        });
+      }
+    });
+
+    const suppAddBtn = document.getElementById("supp_other_add");
+    const suppOther = document.getElementById("supp_other");
+    if (suppAddBtn) {
+      suppAddBtn.addEventListener("click", () => {
+        addCustomSupplementFromInput();
+      });
+    }
+    if (suppOther) {
+      suppOther.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+          addCustomSupplementFromInput();
+        }
+      });
+    }
+  }
+
+  function resetDay() {
+  if (!confirm("오늘 기록을 모두 초기화하시겠습니까?")) return;
+
+  // 1) 모든 기본 체크박스/시간/메모 초기화
+  const els = getAllControls();
+  els.forEach((el) => {
+    if (el.type === "checkbox") el.checked = false;
+    else if (el.tagName === "SELECT" || el.tagName === "TEXTAREA")
+      el.value = "";
+  });
+
+  // 2) 커스텀 보충제(localStorage) 완전 삭제
+  localStorage.removeItem(CUSTOM_SUPP_KEY);
+
+  // 3) 커스텀 보충제 UI 초기화
+  const customBox = document.getElementById("supp_custom_list");
+  if (customBox) customBox.innerHTML = "";
+
+  // 4) 상태 저장
+  saveState();
+
+  // 5) 요약창 닫기
+  const summary = document.getElementById("summary");
+  if (summary) {
+    summary.style.display = "none";
+    summary.textContent = "";
+  }
+
+  // 6) 시간 옵션 초기화
+  populateTimeSelects();
+  recomputeTimeConstraints();
+
+  // 7) 요약 버튼 비활성화
+  updateSummaryButtonState();
+
+  // 8) 초기화 후 아침 탭으로 이동
+  document.querySelector('.nav-tab[data-target="morning"]').click();
+}
+
+
+  // ---- Summary ----
+  function generateSummary() {
+    const lines = [];
+    const val = (id) => {
+      const el = document.getElementById(id);
+      if (!el) return "";
+      if (el.type === "checkbox") return el.checked;
+      return el.value;
+    };
+
+    lines.push("✅ 오늘의 루틴 요약\n");
+
+    const wakeTime = val("wake_time");
+    const sleepTime = val("sleep_time");
+    if (wakeTime) lines.push(`- 기상 시간: ${wakeTime}`);
+    if (sleepTime) lines.push(`- 취침 시간: ${sleepTime}`);
+
+    if (val("morning_cold_shower")) {
+  lines.push("- 아침 찬물 샤워 / 콜드 익스포저 수행");
+}
+
+    if (val("sunlight_done")) {
+      lines.push("- 아침 햇빛 노출 완료");
+    }
+
+    if (val("first_meal_time")) {
+      lines.push(`- 첫 끼 시간: ${val("first_meal_time")}`);
+    }
+    if (val("first_meal_low_glycemic")) {
+      lines.push("- 혈당 스파이크 최소화를 의식적으로 관리함");
+    }
+
+    const workoutType = val("workout_type");
+    const workoutTime = val("workout_time");
+    if (workoutType || workoutTime) {
+      lines.push(
+        `- 운동: ${workoutTime || "시간 미기록"} / 유형: ${
+          workoutType || "선택 안 함"
+        }`
+      );
+    }
+
+    const supplements = [];
+    if (val("supp_vitd")) supplements.push("비타민 D");
+    if (val("supp_omega3")) supplements.push("오메가3");
+    if (val("supp_multi")) supplements.push("멀티비타민");
+    if (val("supp_b12")) supplements.push("비타민 B12");
+    if (val("supp_polyphenol")) supplements.push("폴리페놀");
+    if (val("supp_nmn_nr")) supplements.push("NR/NMN");
+    if (val("supp_creatine")) supplements.push("크레아틴");
+
+    document.querySelectorAll(".supp-custom-item").forEach((cb) => {
+      if (cb.checked) {
+        const label = cb.closest("label");
+        if (label) {
+          supplements.push(label.textContent.trim());
+        }
+      }
+    });
+
+    if (supplements.length > 0) {
+      lines.push(`- 보충제: ${supplements.join(", ")}`);
+    }
+
+    const amSkin =
+      val("am_cleanse") || val("am_vitc") || val("am_spf") || val("am_moisturizer");
+    const pmSkin =
+      val("pm_cleanse") || val("pm_retinol") || val("pm_moisturizer") || val("pm_neck_hands");
+    if (amSkin) lines.push("- 아침 스킨케어 루틴 수행");
+    if (pmSkin) lines.push("- 저녁 스킨케어 루틴 수행");
+
+    const summary = document.getElementById("summary");
+    summary.textContent = lines.join("\n");
+    summary.style.display = "block";
+  }
+
+  function setupTabs() {
+    const tabs = document.querySelectorAll(".nav-tab");
+    tabs.forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const targetId = tab.getAttribute("data-target");
+        if (!targetId) return;
+
+        const targetIndex = STAGE_ORDER.indexOf(targetId);
+
+        if (targetIndex > -1) {
+          for (let i = 0; i < targetIndex; i++) {
+            const prevStage = STAGE_ORDER[i];
+            if (!isStageComplete(prevStage)) {
+              alert(
+                "각 섹션에서 '시간 선택 + 체크박스 최소 1개'가 완료되어야 다음 단계로 이동할 수 있습니다."
+              );
+              return;
+            }
+          }
+        }
+
+        tabs.forEach((t) => t.classList.remove("active"));
+        tab.classList.add("active");
+
+        STAGE_ORDER.forEach((id) => {
+          const sec = document.getElementById(id);
+          if (!sec) return;
+          sec.style.display = id === targetId ? "block" : "none";
+        });
+      });
+    });
+  }
+
+  // ---- Init ----
+  document.addEventListener("DOMContentLoaded", () => {
+    initTimeOptions();
+    populateTimeSelects();
+
+    const customList = loadCustomSuppList();
+    renderCustomSupplements(customList);
+
+    loadState();
+    recomputeTimeConstraints();
+    attachChangeListeners();
+    setupTabs();
+    updateSummaryButtonState();
+
+    document.getElementById("reset_day").addEventListener("click", resetDay);
+    document
+      .getElementById("generate_summary")
+      .addEventListener("click", generateSummary);
+  });
+</script>
+
+</body>
+</html>

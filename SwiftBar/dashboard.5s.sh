@@ -4,9 +4,10 @@
 export LC_ALL=en_US.UTF-8
 export LANG=en_US.UTF-8
 
-PY="$HOME/Desktop/thegabi/venv/bin/python"      # 가상환경 파이썬
-WD="$HOME/Desktop/thegabi"                       # webproject.py 위치
-LOG="$HOME/Library/Logs/SwiftBar-dashboard.log"  # 로그
+# 맨 위쪽 변수들
+PY="$HOME/Sung/thegabi/venv/bin/python3"
+WD="$HOME/Sung/thegabi"
+LOG="$HOME/Library/Logs/SwiftBar-dashboard.log"
 
 cd "$WD" 2>/dev/null || { echo "경로 오류"; exit 0; }
 [[ -x "$PY" ]] || { echo "가상환경 점검 필요"; exit 0; }
@@ -91,7 +92,7 @@ slot=$(( ( $(date +%s) / interval ) % 4 ))
 
 case $slot in
   0)
-    echo "🌤${w_fmt}°"
+    echo "${w_fmt}°"
     ;;
   1)
     echo "T${t_fmt}"
